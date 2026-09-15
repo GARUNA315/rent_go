@@ -1,0 +1,104 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}OTP Inbox - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="vehicles-page">
+
+    <div class="vehicles-hero">
+        <h2><i class="fa-solid fa-envelope-open-text"></i> OTP Inbox</h2>
+        <p>
+            Every OTP record stored in the database. OTPs are delivered in-app and to
+            the server console; only their hashes are stored here.
+        </p>
+    </div>
+
+    <div class="vehicles-count">
+        <p><strong>{{ otps|length }}</strong> recent OTP record{{ otps|length|pluralize }}</p>
+        <a href="{% url 'admin:rental_phoneotp_changelist' %}" class="view-all">
+            Open in Admin <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="otp-inbox-table-wrap">
+
+        {% if otps %}
+
+            <table class="otp-inbox-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Phone</th>
+                        <th>Purpose</th>
+                        <th>Channel</th>
+                        <th>Status</th>
+                        <th>Attempts</th>
+                        <th>Expires</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for otp in otps %}
+                        <tr class="{% if otp.is_used or otp.is_expired %}muted-row{% endif %}">
+                            <td>{{ otp.pk }}</td>
+                            <td>+{{ otp.phone }}</td>
+                            <td><span class="pill pill-{{ otp.purpose }}">{{ otp.get_purpose_display }}</span></td>
+                            <td>{{ otp.get_channel_display }}</td>
+                            <td>
+                                {% if otp.is_used %}
+                                    <span class="pill pill-used">Used</span>
+                                {% elif otp.is_expired %}
+                                    <span class="pill pill-expired">Expired</span>
+                                {% elif otp.is_verified %}
+                                    <span class="pill pill-verified">Verified</span>
+                                {% else %}
+                                    <span class="pill pill-live">Live</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ otp.attempts }}/5</td>
+                            <td>{{ otp.expires_at|date:"d M H:i" }}</td>
+                            <td>{{ otp.created_at|date:"d M H:i" }}</td>
+                            <td>
+                                <form method="post" class="inline-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pk" value="{{ otp.pk }}">
+                                    <button name="action" value="resend" class="pill-btn"
+                                            title="Generate a fresh OTP (shown in message/console)">
+                                        Resend
+                                    </button>
+                                    <button name="action" value="mark_used" class="pill-btn"
+                                            title="Mark as consumed">
+                                        Mark used
+                                    </button>
+                                    <button name="action" value="delete" class="pill-btn danger"
+                                            onclick="return confirm('Delete this OTP record?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <div class="no-vehicles wide">
+                <i class="fa-solid fa-envelope-open"></i>
+                <h3>No OTP records yet</h3>
+                <p>OTPs appear here the moment someone requests one on the sign-in page.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

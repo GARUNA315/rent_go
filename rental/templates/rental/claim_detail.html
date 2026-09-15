@@ -1,0 +1,153 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Claim #{{ claim.pk }} - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="claim-detail-page">
+
+    <div class="detail-back" onclick="history.back()">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </div>
+
+    <div class="claim-detail-card reveal">
+
+        <div class="claim-detail-head">
+            <div class="claim-kind kind-{{ claim.kind }}">
+                <i class="fa-solid {% if claim.kind == 'accident' %}fa-car-crash{% elif claim.kind == 'theft' %}fa-mask{% elif claim.kind == 'breakdown' %}fa-wrench{% else %}fa-brush{% endif %}"></i>
+            </div>
+            <div>
+                <h2>Claim #{{ claim.pk }} — {{ claim.get_kind_display }}</h2>
+                <p>{{ claim.vehicle.brand }} {{ claim.vehicle.name }}
+                   {% if claim.trip %}(trip #{{ claim.trip.pk }}){% endif %}</p>
+            </div>
+            <div class="claim-status-col">
+                <span class="pill status-{{ claim.status }}">{{ claim.get_status_display }}</span>
+                <span class="pill {% if claim.verified %}verified-ok{% else %}verified-pending{% endif %}">
+                    {% if claim.verified %}<i class="fa-solid fa-circle-check"></i> Genuine &amp; verified{% else %}<i class="fa-solid fa-circle-half-stroke"></i> {{ claim.verification_label }}{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="claim-grid">
+
+            <div class="claim-section">
+                <h3><i class="fa-solid fa-circle-info"></i> Incident</h3>
+                <p><strong>When:</strong> {{ claim.incident_at|date:"d M Y, H:i" }}</p>
+                {% if claim.incident_location %}<p><strong>Where:</strong> {{ claim.incident_location }}</p>{% endif %}
+                {% if claim.latitude and claim.longitude %}
+                    <p><strong>Coords:</strong> {{ claim.latitude|floatformat:4 }}, {{ claim.longitude|floatformat:4 }}</p>
+                {% endif %}
+                {% if claim.damage_estimate %}
+                    <p><strong>Estimate:</strong> ₹{{ claim.damage_estimate }}</p>
+                {% endif %}
+                <div class="claim-description">
+                    <strong>Description:</strong>
+                    <p>{{ claim.description }}</p>
+                </div>
+            </div>
+
+            <div class="claim-section">
+                <h3><i class="fa-solid fa-scale-balanced"></i> FIR Verification</h3>
+
+                {% if claim.fir_number %}
+                    <p><strong>FIR No:</strong> {{ claim.fir_number }}</p>
+                    <p><strong>Police Station:</strong> {{ claim.fir_station }}</p>
+                    {% if claim.fir_image %}
+                        <a class="doc-link" href="{{ claim.fir_image.url }}" target="_blank">
+                            <i class="fa-solid fa-file-lines"></i> View FIR copy
+                        </a>
+                    {% endif %}
+                    <p class="verified-banner verified-ok">
+                        <i class="fa-solid fa-circle-check"></i> FIR on file — this is our primary
+                        proof to decide whether the claim is true or not.
+                    </p>
+                {% else %}
+                    <p class="verified-banner warn">
+                        <i class="fa-solid fa-triangle-exclamation"></i> No FIR provided yet.
+                        Claims without an FIR are much harder to verify as genuine.
+                    </p>
+                {% endif %}
+
+                {% if claim.photo %}
+                    <a class="doc-link" href="{{ claim.photo.url }}" target="_blank">
+                        <i class="fa-solid fa-image"></i> Damage photo 1
+                    </a>
+                {% endif %}
+                {% if claim.photo2 %}
+                    <a class="doc-link" href="{{ claim.photo2.url }}" target="_blank">
+                        <i class="fa-solid fa-image"></i> Damage photo 2
+                    </a>
+                {% endif %}
+
+                {% if claim.decision_note %}
+                    <div class="decision-note">
+                        <strong><i class="fa-solid fa-gavel"></i> Decision note:</strong>
+                        <p>{{ claim.decision_note }}</p>
+                    </div>
+                {% endif %}
+
+                {% if claim.decided_at %}
+                    <p class="muted"><strong>Decided:</strong> {{ claim.decided_at|date:"d M Y H:i" }}
+                        {% if claim.decided_by %} by {{ claim.decided_by.username }}{% endif %}</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        {% if reviewable %}
+
+            <div class="review-panel reveal">
+                <h3><i class="fa-solid fa-gavel"></i> Staff review — verify this FIR &amp; claim</h3>
+
+                <form method="post" action="{% url 'review_claim' claim.pk %}">
+                    {% csrf_token %}
+
+                    <label class="auth-field wide">
+                        <span><i class="fa-solid fa-pen"></i> Decision note (public)</span>
+                        <textarea name="decision_note" rows="3">{{ claim.decision_note }}</textarea>
+                    </label>
+
+                    <div class="review-actions">
+
+                        <button class="login-btn" name="action" value="under_review">
+                            <i class="fa-solid fa-clock"></i> Keep under review
+                        </button>
+
+                        <button class="login-btn" name="action" value="reject">
+                            <i class="fa-solid fa-ban"></i> Reject (not genuine)
+                        </button>
+
+                        <button class="search-button width-auto" name="action" value="approve">
+                            <i class="fa-solid fa-check"></i> Approve — VERIFY true
+                        </button>
+
+                        <button class="search-button width-auto" name="action" value="settle">
+                            <i class="fa-solid fa-handshake"></i> Settle payout
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+        <div class="claim-actions">
+            <a href="{% url 'claims' %}" class="login-btn">
+                <i class="fa-solid fa-arrow-left"></i> All claims
+            </a>
+            {% if claim.trip %}
+                <a href="{% url 'track_trip' claim.trip.pk %}" class="login-btn">
+                    <i class="fa-solid fa-satellite-dish"></i> View trip GPS log
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

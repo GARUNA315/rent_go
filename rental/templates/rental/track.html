@@ -1,0 +1,100 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Live GPS Track — {{ vehicle.brand }} {{ vehicle.name }}{% endblock %}
+
+{% block content %}
+
+<section class="track-page" data-csrf="{{ csrf_token }}"
+         data-updates-url="{{ updates_url }}"
+         data-report-url="{{ report_url }}"
+         data-trip-id="{{ trip.pk }}">
+
+    <div class="track-head reveal">
+        <div>
+            <h2><i class="fa-solid fa-satellite-dish"></i> Live GPS Tracking</h2>
+            <p>
+                <strong>{{ vehicle.brand }} {{ vehicle.name }}</strong>
+                ({{ vehicle.registration_number|default:"no RC on file" }})
+                — rented by {{ trip.renter.first_name|default:trip.renter.username }} ·
+                owner {{ trip.owner.first_name|default:trip.owner.username }}
+            </p>
+        </div>
+        <div class="track-badges">
+            <span class="track-badge live"><i class="fa-solid fa-circle"></i> Active trip</span>
+            <span class="track-badge">{{ update_count }} ping{{ update_count|pluralize }}</span>
+        </div>
+    </div>
+
+    <div class="track-layout">
+
+        <div class="track-map-wrap reveal">
+            <div id="trackMap" class="track-map"></div>
+            <div class="map-stats" id="mapStats">
+                <div><span class="key">Last seen</span><span class="val" id="statTime">—</span></div>
+                <div><span class="key">Speed</span><span class="val" id="statSpeed">0 km/h</span></div>
+                <div><span class="key">Source</span><span class="val" id="statSource">—</span></div>
+                <div><span class="key">Points</span><span class="val" id="statPoints">0</span></div>
+            </div>
+        </div>
+
+        <div class="track-controls reveal">
+
+            <div class="control-card">
+                <h3>Report my location</h3>
+                <p>Uses your browser's GPS to send a live ping for this trip.</p>
+                <button class="search-button width-auto" id="gpsPingBtn">
+                    <i class="fa-solid fa-location-crosshairs"></i> Send GPS Ping
+                </button>
+            </div>
+
+            <div class="control-card">
+                <h3>Demo simulation</h3>
+                <p>No GPS device handy? Move the marker along a fake route to
+                   see live tracking in action.</p>
+                <button class="login-btn" id="simulateBtn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Simulate movement
+                </button>
+                <button class="login-btn" id="stopSimBtn" style="display:none;">
+                    <i class="fa-solid fa-stop"></i> Stop simulation
+                </button>
+            </div>
+
+            {% if trip.renter == user or trip.owner == user or user.is_staff %}
+                <div class="control-card">
+                    <h3>End this trip</h3>
+                    <p>Mark the trip complete — the vehicle goes back on the market
+                       and the final amount is settled offline with the owner.</p>
+                    <form action="{% url 'end_trip' trip.pk %}" method="post"
+                          onsubmit="return confirm('End this trip and free the vehicle?');">
+                        {% csrf_token %}
+                        <button type="submit" class="login-btn danger-btn">
+                            <i class="fa-solid fa-flag-checkered"></i> End Trip
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <div class="control-card">
+                <h3><i class="fa-solid fa-ban"></i> How GPS tracking helps</h3>
+                <p>
+                    Every ping is stored with a timestamp. If an accident or damage is
+                    reported later, the recorded route and speeds help our risk team
+                    verify the claim against the FIR.
+                </p>
+                <a href="{% url 'risk' %}#fir-verification" class="doc-link">Read the risk policy</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'rental/js/track.js' %}"></script>
+{% endblock %}

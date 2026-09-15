@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent&Go | Rent Cars & Bikes or Share Yours</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body data-page="index">
+
+    <!-- ================= HEADER ================= -->
+    <header class="header">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-location-dot"></i>
+                <i class="fa-solid fa-car-side"></i>
+            </div>
+            <div>
+                <h1>Rent<span>&</span>Go</h1>
+                <p>Drive · Ride · Share</p>
+            </div>
+        </a>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="vehicles.html">Vehicles</a>
+            <a href="add-vehicle.html">Add Vehicle</a>
+        </nav>
+
+        <div class="header-buttons">
+            <a class="login-btn" href="auth.html?mode=login">Login</a>
+            <a class="signup-btn" href="auth.html?mode=signup">Sign Up</a>
+            <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="nearby"><i class="fa-solid fa-location-dot"></i> Your Nearby Vehicle Rental Marketplace</span>
+
+            <h2>Rent <span>Cars &amp; Bikes</span><br>or Share Yours</h2>
+
+            <p>Find the perfect ride near you. Rent cars and bikes from trusted owners or lend your own vehicle and earn. It&rsquo;s easy, safe and community driven!</p>
+
+            <div class="features">
+                <div><i class="fa-solid fa-shield-halved"></i> Trusted Owners</div>
+                <div><i class="fa-solid fa-location-dot"></i> Nearby Locations</div>
+                <div><i class="fa-solid fa-wallet"></i> Secure Payments</div>
+                <div><i class="fa-solid fa-users"></i> Community Driven</div>
+            </div>
+        </div>
+
+        <div class="vehicles">
+            <i class="fa-solid fa-car-side verna"></i>
+            <span class="vehicle-label">Hyundai Verna</span>
+            <i class="fa-solid fa-motorcycle bullet"></i>
+            <span class="vehicle-label" style="right:5%; left:auto;">Royal Enfield</span>
+        </div>
+    </section>
+
+    <!-- ================= SEARCH ================= -->
+    <section class="search-container">
+        <div class="search-tabs">
+            <button class="active">Rent a Vehicle</button>
+            <button onclick="window.location.href='add-vehicle.html'">Borrow &amp; Lend</button>
+        </div>
+
+        <form class="search-form" id="searchForm">
+
+            <div class="input-box">
+                <i class="fa-solid fa-location-dot" id="nearBtn" title="Detect my location"></i>
+                <div style="flex:1;">
+                    <label>Location</label>
+                    <input type="text" id="location" placeholder="City / area">
+                    <input type="hidden" id="locationLat">
+                    <input type="hidden" id="locationLng">
+                </div>
+            </div>
+
+            <div class="input-box">
+                <i class="fa-solid fa-car"></i>
+                <div style="flex:1;">
+                    <label>Vehicle Type</label>
+                    <select id="vehicleType">
+                        <option value="">Car / Bike</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-box">
+                <i class="fa-solid fa-calendar-days"></i>
+                <div style="flex:1;">
+                    <label>Start Date</label>
+                    <input type="date" id="startDate">
+                </div>
+            </div>
+
+            <div class="input-box">
+                <i class="fa-solid fa-calendar-days"></i>
+                <div style="flex:1;">
+                    <label>End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+
+            <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+
+        </form>
+    </section>
+
+    <!-- ================= CATEGORIES ================= -->
+    <section class="categories">
+
+        <a href="vehicles.html?type=car" class="category car-card" style="text-decoration:none;">
+            <i class="fa-solid fa-car"></i>
+            <h3>Cars</h3>
+            <p>Sedans, SUVs, Hatchbacks</p>
+        </a>
+
+        <a href="vehicles.html?type=bike" class="category bike-card" style="text-decoration:none;">
+            <i class="fa-solid fa-motorcycle"></i>
+            <h3>Bikes</h3>
+            <p>Scooters, Sports, Commuter</p>
+        </a>
+
+        <a href="add-vehicle.html" class="category lend-card" style="text-decoration:none;">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <h3>Borrow &amp; Lend</h3>
+            <p>Share your vehicle and earn</p>
+        </a>
+
+        <button type="button" class="category nearby-card" id="nearCategory" style="border:none; width:100%;">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <h3>Nearby</h3>
+            <p>Find rides close to you</p>
+        </button>
+
+    </section>
+
+    <!-- ================= NEARBY VEHICLES ================= -->
+    <section class="vehicles-section">
+
+        <div class="section-title-row">
+            <h2><i class="fa-solid fa-location-dot"></i> Vehicles Near You</h2>
+            <a class="view-all" href="vehicles.html">View all &rarr;</a>
+        </div>
+
+        <p class="near-note">Click the location icon above to detect your location and see vehicles near you.</p>
+
+        <div class="v-grid" id="vehiclesGrid"></div>
+
+    </section>
+
+    <!-- ================= HOW IT WORKS ================= -->
+    <section class="how">
+        <h2>How It Works?</h2>
+
+        <div class="steps">
+
+            <div>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <h3>1. Search</h3>
+                <p>Find the perfect vehicle near you</p>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-calendar-days"></i>
+                <h3>2. Book</h3>
+                <p>Choose dates and make a request</p>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>3. Pay Securely</h3>
+                <p>Use our safe payment system</p>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-car"></i>
+                <h3>4. Ride &amp; Enjoy</h3>
+                <p>Pick up and hit the road!</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ================= WHY ================= -->
+    <section class="why">
+        <h2>Why Choose Rent&amp;Go?</h2>
+
+        <div class="why-grid">
+            <p><i class="fa-solid fa-circle-check"></i>Verified users &amp; vehicles</p>
+            <p><i class="fa-solid fa-circle-check"></i>Secure online payments</p>
+            <p><i class="fa-solid fa-circle-check"></i>Flexible rental plans (hourly / daily / weekly)</p>
+            <p><i class="fa-solid fa-circle-check"></i>24/7 customer support</p>
+            <p><i class="fa-solid fa-circle-check"></i>Affordable prices</p>
+            <p><i class="fa-solid fa-circle-check"></i>Easy booking &amp; management</p>
+        </div>
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+        <h2>Rent<span>&</span>Go</h2>
+        <p>Drive · Ride · Share</p>
+        <p class="copyright">&copy; 2026 Rent&amp;Go. All Rights Reserved.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

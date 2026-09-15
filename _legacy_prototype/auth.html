@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up | Rent&Go</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="auth-body">
+
+    <div class="auth-container">
+
+        <!-- ================= LEFT IMAGE PANEL ================= -->
+        <div class="auth-image">
+
+            <a href="index.html" class="auth-logo" style="text-decoration:none; color:white;">
+                <i class="fa-solid fa-location-dot"></i>
+                <h1>Rent<span>&</span>Go</h1>
+            </a>
+
+            <h2>Your Nearby<br>Vehicle Rental<br><span>Marketplace</span></h2>
+
+            <p>Rent cars and bikes from trusted owners, or share your own vehicle and earn. It's easy, safe and community driven!</p>
+
+            <i class="fa-solid fa-car-side auth-vehicle"></i>
+        </div>
+
+        <!-- ================= RIGHT FORM PANEL ================= -->
+        <div class="auth-form">
+
+            <div style="width:100%; max-width:400px;">
+
+                <!-- LOGIN -->
+                <div class="auth-page hidden" id="loginPage">
+                    <h2 style="margin-top:20px;">Welcome Back</h2>
+                    <p class="subtitle">Login with your mobile number</p>
+
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <div class="phone-input">
+                            <span>+91</span>
+                            <input type="tel" id="loginMobile" maxlength="10" placeholder="10-digit mobile number">
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="sendLoginOTP()">
+                        Send OTP <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <div class="switch">
+                        Don&rsquo;t have an account?
+                        <button onclick="showSignup()">Sign Up</button>
+                    </div>
+
+                    <button class="guest" onclick="window.location.href='index.html'">
+                        Continue as Guest <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- SIGNUP -->
+                <div class="auth-page hidden" id="signupPage">
+                    <h2 style="margin-top:20px;">Create Account</h2>
+                    <p class="subtitle">Sign up with your mobile number</p>
+
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <div class="phone-input">
+                            <span>+91</span>
+                            <input type="tel" id="signupMobile" maxlength="10" placeholder="10-digit mobile number">
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="sendSignupOTP()">
+                        Send OTP <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <div class="switch">
+                        Already have an account?
+                        <button onclick="showLogin()">Sign In</button>
+                    </div>
+                </div>
+
+                <!-- OTP -->
+                <div class="auth-page hidden" id="otpPage">
+                    <h2 style="margin-top:20px;">Verify OTP</h2>
+                    <p class="subtitle">We sent a 6-digit code to <strong id="otpMobile">+91</strong></p>
+
+                    <div class="otp-container">
+                        <input class="otp" type="text" maxlength="1" inputmode="numeric">
+                        <input class="otp" type="text" maxlength="1" inputmode="numeric">
+                        <input class="otp" type="text" maxlength="1" inputmode="numeric">
+                        <input class="otp" type="text" maxlength="1" inputmode="numeric">
+                        <input class="otp" type="text" maxlength="1" inputmode="numeric">
+                        <input class="otp" type="text" maxlength="1" inputmode="numeric">
+                    </div>
+
+                    <p class="resend">Didn&rsquo;t receive the code? <strong id="timer">00:45</strong></p>
+
+                    <button class="primary-btn" onclick="verifyOTP()">Verify OTP</button>
+
+                    <p class="otp-message" id="otpMessage"></p>
+
+                    <button class="change-number" onclick="backToNumber()">
+                        <i class="fa-solid fa-arrow-left"></i> Change mobile number
+                    </button>
+                </div>
+
+                <!-- PROFILE -->
+                <div class="auth-page hidden" id="profilePage">
+                    <h2 style="margin-top:20px;">Complete Your Profile</h2>
+                    <p class="subtitle">One last step to join the community</p>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email (optional)</label>
+                        <input type="email" id="email" placeholder="you@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="At least 8 characters">
+                    </div>
+
+                    <div class="form-group">
+                        <label>I am a</label>
+                        <select id="role">
+                            <option value="renter">Renter (looking to rent)</option>
+                            <option value="owner">Owner (want to lend my vehicle)</option>
+                        </select>
+                    </div>
+
+                    <button class="primary-btn" onclick="createAccount()">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </button>
+                </div>
+
+                <!-- SUCCESS -->
+                <div class="auth-page hidden success-page" id="successPage">
+                    <h2 style="margin-top:20px;">Account Created!</h2>
+
+                    <div class="success-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <p>Welcome to the Rent&Go family! Here is your unique Rent&Go ID.</p>
+
+                    <div class="user-id">
+                        <span>Your Rent&Go ID</span>
+                        <strong id="userID">RG000000</strong>
+                    </div>
+
+                    <button class="primary-btn" onclick="goHome()">
+                        <i class="fa-solid fa-house"></i> Go to Home
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

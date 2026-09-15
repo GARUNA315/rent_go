@@ -1,0 +1,123 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}File a Claim - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="add-vehicle-page">
+
+    <div class="add-vehicle-head reveal">
+        <h2><i class="fa-solid fa-file-shield"></i> File a Claim</h2>
+        <p>{{ vehicle.brand }} {{ vehicle.name }} — {{ vehicle.registration_number|default:"no RC number" }}</p>
+    </div>
+
+    {% if not active_trip %}
+        <div class="notice-box info reveal">
+            <i class="fa-solid fa-circle-info"></i>
+            You have no active trip on this vehicle. You can still file a claim for
+            damage from a past trip — our risk team will verify it against trip GPS records and the FIR.
+        </div>
+    {% endif %}
+
+    <div class="add-vehicle-card reveal">
+
+        <form method="post" enctype="multipart/form-data"
+              action="{% url 'file_claim' vehicle.pk %}" novalidate>
+            {% csrf_token %}
+
+            <div class="add-vehicle-grid">
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-sliders"></i> Type of Incident</span>
+                    {{ form.kind }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-calendar-days"></i> Date &amp; Time</span>
+                    {{ form.incident_at }}
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-align-left"></i> What happened?</span>
+                    {{ form.description }}
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-location-dot"></i> Incident Location</span>
+                    {{ form.incident_location }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-latitude"></i> Latitude</span>
+                    {{ form.latitude }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-longitude"></i> Longitude</span>
+                    {{ form.longitude }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-indian-rupee-sign"></i> Damage Estimate (₹)</span>
+                    {{ form.damage_estimate }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-image"></i> Damage Photo</span>
+                    {{ form.photo }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-image"></i> Extra Photo</span>
+                    {{ form.photo2 }}
+                </label>
+
+                <div class="fir-block wide">
+                    <h3><i class="fa-solid fa-scale-balanced"></i> FIR Details (required for verification)</h3>
+                    <p class="field-hint">
+                        The police FIR is how we confirm the incident is genuine. Fill the
+                        details below and attach a copy of the FIR.
+                    </p>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-hashtag"></i> FIR Number</span>
+                        {{ form.fir_number }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-building-shield"></i> Police Station</span>
+                        {{ form.fir_station }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-file-lines"></i> FIR Copy</span>
+                        {{ form.fir_image }}
+                    </label>
+                </div>
+
+            </div>
+
+            {% if form.errors %}
+                <div class="message message-error">
+                    {% for field in form %}
+                        {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="add-vehicle-actions">
+                <a href="{% url 'vehicle_detail' vehicle.pk %}" class="login-btn">Cancel</a>
+                <button type="submit" class="search-button width-auto">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Claim
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

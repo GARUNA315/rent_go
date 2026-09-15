@@ -1,0 +1,326 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Sign In / Sign Up - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="auth-page" id="authRoot"
+         data-mode="{{ mode }}"
+         data-google-id="{{ google_client_id|default:'' }}"
+         data-email-smtp="{{ email_smtp|yesno:'true,false' }}"
+         data-from="{{ default_from_email }}">
+
+    <div class="auth-card">
+
+        <div class="auth-head">
+            <div class="logo-icon auth-logo">
+                <i class="fa-solid fa-location-dot"></i>
+                <i class="fa-solid fa-car-side car-logo"></i>
+            </div>
+            <h2 id="authTitle">Welcome to Rent&amp;Go</h2>
+            <p id="authSubtitle">Verify your phone, Google account or email to continue.</p>
+        </div>
+
+        {% csrf_token %}
+
+        <!-- ====================================================
+             STEP 1 : CHOOSE METHOD — Phone | Google | Email
+        ==================================================== -->
+
+        <div class="auth-panel active" id="stepMethod">
+
+            <!-- ---- Phone entry ---- -->
+            <div class="phone-input">
+                <span class="phone-prefix">+91</span>
+                <input type="tel" id="otpPhone" maxlength="10"
+                       placeholder="Enter 10-digit mobile number"
+                       inputmode="numeric" autocomplete="tel">
+            </div>
+
+            <button type="button" class="search-button auth-submit" id="sendOtpBtn">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Send OTP</span>
+            </button>
+
+            <p class="auth-hint" id="phoneHint"></p>
+
+            {% if google_client_id %}
+            <!-- ---- Google button ---- -->
+            <div class="or-divider">
+                <span>or</span>
+            </div>
+
+            <button type="button" class="g-btn" id="googleLoginBtn" disabled>
+                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>Sign in with Google</span>
+            </button>
+
+            <p class="auth-hint" id="googleHint"></p>
+
+            <p class="auth-enter-explain" id="googleNote" style="display:none;">
+                Google sign-in is not yet configured.<br>
+                Your developer needs to set <code>GOOGLE_OAUTH_CLIENT_ID</code> in <code>.env</code>.
+            </p>
+
+            {% endif %}
+
+            <div class="alt-switch">
+                <button type="button" class="link-btn" id="switchEmailBtn">
+                    <i class="fa-solid fa-envelope"></i>
+                    Verify with Email instead
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ====================================================
+             STEP 2 : PHONE OTP INPUT
+        ==================================================== -->
+
+        <div class="auth-panel" id="stepOtp">
+
+            <p class="otp-to" id="otpTo">OTP sent to +91XXXXXXXXXX</p>
+
+            <div class="inapp-otp" id="inappOtp" style="display:none;">
+                <p>Your OTP</p>
+                <div class="inapp-otp-code" id="inappOtpCode">000000</div>
+                <p class="inapp-otp-note">
+                    Delivered in-app &amp; stored in the database.
+                    Valid for {{ otp_expiry }} minute{{ otp_expiry|pluralize }}.
+                </p>
+            </div>
+
+            <div class="otp-inputs" id="otpInputs"></div>
+
+            <p class="auth-hint" id="otpHint"></p>
+
+            <button type="button" class="search-button auth-submit" id="verifyOtpBtn">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Verify &amp; Continue</span>
+            </button>
+
+            <div class="otp-actions">
+                <button type="button" class="link-btn" id="resendOtpBtn">
+                    Resend OTP (<span class="timer-text" id="timerText">60</span>s)
+                </button>
+                <button type="button" class="link-btn" id="changeNumberBtn">
+                    Change number
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ====================================================
+             STEP 3 : PHONE SIGNUP (new user after OTP verify)
+        ==================================================== -->
+
+        <div class="auth-panel" id="stepSignup">
+
+            <p class="otp-to" id="signupIntro">Great! Let's create your account.</p>
+
+            <form id="signupForm" novalidate>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-id-card"></i> Full Name</span>
+                    <input type="text" id="sFullName" placeholder="e.g. Anurag Pateriya">
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-user"></i> Username</span>
+                    <input type="text" id="sUsername" placeholder="Choose a username">
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-envelope"></i> Email (optional)</span>
+                    <input type="email" id="sEmail" placeholder="you@example.com">
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-lock"></i> Password</span>
+                    <input type="password" id="sPassword" placeholder="Min. 6 characters">
+                </label>
+
+                <button type="submit" class="search-button auth-submit">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Create Account</span>
+                </button>
+
+            </form>
+
+            <p class="auth-switch">
+                <button type="button" class="link-btn" id="backToOtpBtn">
+                    <i class="fa-solid fa-arrow-left"></i> Go back
+                </button>
+            </p>
+
+        </div>
+
+        <!-- ====================================================
+             STEP 4 : EMAIL — enter address
+        ==================================================== -->
+
+        <div class="auth-panel" id="stepEmail">
+
+            <p class="otp-to">Enter your email address to continue.</p>
+
+            <div class="phone-input">
+                <span class="phone-prefix" style="width:110px;text-align:center;font-size:13px;background:#f0f7ff;">
+                    <i class="fa-solid fa-envelope" style="margin-right:0;"></i>
+                </span>
+                <input type="email" id="emailAddr" maxlength="254"
+                       placeholder="you@example.com" inputmode="email"
+                       autocomplete="email">
+            </div>
+
+            <p class="auth-hint" id="emailHint"></p>
+
+            <button type="button" class="search-button auth-submit" id="emailSendBtn">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Send Verification Code</span>
+            </button>
+
+            <div class="divider-row"><span>or</span></div>
+
+            <button type="button" class="g-btn" id="googleFromEmailBtn" disabled>
+                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>Sign in with Google</span>
+            </button>
+
+            <div class="alt-switch">
+                <button type="button" class="link-btn" id="backToMethodBtn">
+                    <i class="fa-solid fa-arrow-left"></i> Use phone instead
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ====================================================
+             STEP 5 : EMAIL — enter verification code
+        ==================================================== -->
+
+        <div class="auth-panel" id="stepEmailCode">
+
+            <p class="otp-to" id="emailCodeTo">Code sent to a***x@example.com</p>
+
+            <div class="inapp-otp" id="emailInappCode" style="display:none;">
+                <p>Your verification code</p>
+                <div class="inapp-otp-code" id="emailInappCodeValue">000000</div>
+                <p class="inapp-otp-note">
+                    No SMTP configured — code shown on screen.
+                    Valid for {{ otp_expiry }} minute{{ otp_expiry|pluralize }}.
+                </p>
+            </div>
+
+            <div class="otp-inputs" id="emailOtpInputs"></div>
+
+            <p class="auth-hint" id="emailCodeHint"></p>
+
+            <button type="button" class="search-button auth-submit" id="emailVerifyBtn">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Verify Code</span>
+            </button>
+
+            <div class="otp-actions">
+                <button type="button" class="link-btn" id="emailResendBtn">
+                    Resend (<span class="timer-text" id="emailTimerText">60</span>s)
+                </button>
+                <button type="button" class="link-btn" id="changeEmailBtn">
+                    Change email
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ====================================================
+             STEP 6 : EMAIL SIGNUP (new user after email verify)
+        ==================================================== -->
+
+        <div class="auth-panel" id="stepEmailSignup">
+
+            <p class="otp-to" id="emailSignupIntro">Create your account.</p>
+
+            <form id="emailSignupForm" novalidate>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-envelope"></i> Verified Email</span>
+                    <input type="email" id="eVerifiedEmail" disabled
+                           style="background:#f0f7ff;cursor:not-allowed;font-weight:600;">
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-id-card"></i> Full Name</span>
+                    <input type="text" id="eFullName" placeholder="e.g. Anurag Pateriya">
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-user"></i> Username</span>
+                    <input type="text" id="eUsername" placeholder="Choose a username">
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-lock"></i> Password</span>
+                    <input type="password" id="ePassword" placeholder="Min. 6 characters">
+                </label>
+
+                <button type="submit" class="search-button auth-submit">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Create Account</span>
+                </button>
+
+            </form>
+
+            <p class="auth-switch">
+                <button type="button" class="link-btn" id="backToEmailCodeBtn">
+                    <i class="fa-solid fa-arrow-left"></i> Go back
+                </button>
+            </p>
+
+        </div>
+
+        <!-- ====================================================
+             STEP 7 : SUCCESS
+        ==================================================== -->
+
+        <div class="auth-panel" id="stepSuccess">
+
+            <div class="success-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <h3 id="successTitle">Success!</h3>
+            <p class="auth-hint" id="successText">You are now signed in.</p>
+
+            <button type="button" class="search-button auth-submit" id="goHomeBtn">
+                <i class="fa-solid fa-house"></i>
+                <span>Go to Home</span>
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+
+    {% if google_client_id %}
+    <script src="https://accounts.google.com/gsi/client" async defer
+            onload="window.__gsiLoaded=true; document.dispatchEvent(new Event('gsi:loaded'))"></script>
+    {% endif %}
+
+    <script src="{% static 'rental/js/auth.js' %}"></script>
+
+{% endblock %}

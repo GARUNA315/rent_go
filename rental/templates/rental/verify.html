@@ -1,0 +1,93 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Verify Identity - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="add-vehicle-page">
+
+    <div class="add-vehicle-head reveal">
+        <h2><i class="fa-solid fa-id-card"></i> Verify Your Identity</h2>
+        <p>Photo + Driving Licence + Aadhaar — reviewed by our trust team.</p>
+    </div>
+
+    {% if record.is_verified %}
+        <div class="notice-box success">
+            <i class="fa-solid fa-circle-check"></i>
+            Your identity is <strong>verified</strong>{% if record.review_note %} — {{ record.review_note }}{% endif %}.
+        </div>
+    {% elif record.status == 'rejected' %}
+        <div class="notice-box danger">
+            <i class="fa-solid fa-circle-xmark"></i>
+            Your previous submission was <strong>rejected</strong>{% if record.review_note %} — {{ record.review_note }}{% endif %}.
+            Correct the documents and submit again.
+        </div>
+    {% elif record.photo %}
+        <div class="notice-box info">
+            <i class="fa-solid fa-clock"></i>
+            Your documents are <strong>pending review</strong>. You can still update them below.
+        </div>
+    {% endif %}
+
+    <div class="add-vehicle-card reveal">
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'verify' %}" novalidate>
+            {% csrf_token %}
+
+            <div class="add-vehicle-grid">
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-user"></i> Your Photo</span>
+                    {{ form.photo }}
+                    <small class="field-hint">A clear, recent photo of your face.</small>
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-id-card"></i> Driving Licence Number</span>
+                    {{ form.driving_license_no }}
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-id-card-clip"></i> Driving Licence Photos</span>
+                    {{ form.driving_license_image }}
+                    <small class="field-hint">Front &amp; back copy of the licence.</small>
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-fingerprint"></i> Aadhaar Number</span>
+                    {{ form.aadhaar_no }}
+                    <small class="field-hint">12 digits. Only the last 4 are ever shown publicly.</small>
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-fingerprint"></i> Aadhaar Card Photo</span>
+                    {{ form.aadhaar_image }}
+                    <small class="field-hint">A masked version is recommended for privacy.</small>
+                </label>
+
+            </div>
+
+            {% if form.errors %}
+                <div class="message message-error">
+                    {% for field in form %}
+                        {% for error in field.errors %}<div>{{ error }}</div>{% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="add-vehicle-actions">
+                <a href="{% url 'profile' %}" class="login-btn">Cancel</a>
+                <button type="submit" class="search-button width-auto">
+                    <i class="fa-solid fa-shield-halved"></i> Submit for Review
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

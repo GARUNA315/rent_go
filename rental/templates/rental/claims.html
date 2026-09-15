@@ -1,0 +1,76 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Claims &amp; Risk - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="claims-page">
+
+    <div class="add-vehicle-head reveal">
+        <h2><i class="fa-solid fa-file-shield"></i> My Claims
+            {% if is_staff %}<span class="claim-staff-tag">Staff view — all claims</span>{% endif %}
+        </h2>
+        <p>Every claim goes through FIR-based verification by our risk team.</p>
+    </div>
+
+    {% if claims %}
+
+        <div class="claims-list">
+
+            {% for claim in claims %}
+
+                <a href="{% url 'claim_detail' claim.pk %}" class="claim-card reveal">
+
+                    <div class="claim-kind kind-{{ claim.kind }}">
+                        <i class="fa-solid {% if claim.kind == 'accident' %}fa-car-crash{% elif claim.kind == 'theft' %}fa-mask{% elif claim.kind == 'breakdown' %}fa-wrench{% else %}fa-brush{% endif %}"></i>
+                    </div>
+
+                    <div class="claim-main">
+                        <h3>#{{ claim.pk }} — {{ claim.get_kind_display }}
+                            <span class="claim-vehicle">{{ claim.vehicle.brand }} {{ claim.vehicle.name }}</span>
+                        </h3>
+                        <p class="claim-meta">
+                            <i class="fa-solid fa-calendar-days"></i> {{ claim.incident_at|date:"d M Y H:i" }}
+                            {% if claim.incident_location %}· {{ claim.incident_location }}{% endif %}
+                            {% if claim.damage_estimate %}· ₹{{ claim.damage_estimate }}{% endif %}
+                        </p>
+                        <p class="claim-desc">{{ claim.description|truncatewords:28 }}</p>
+                    </div>
+
+                    <div class="claim-status-col">
+                        <span class="pill status-{{ claim.status }}">{{ claim.get_status_display }}</span>
+                        {% if claim.verified %}
+                            <span class="pill verified-ok"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                        {% elif claim.fir_number %}
+                            <span class="pill verified-pending"><i class="fa-solid fa-clock"></i> FIR on file</span>
+                        {% endif %}
+                    </div>
+
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="no-vehicles wide">
+            <i class="fa-solid fa-file-shield"></i>
+            <h3>No claims yet</h3>
+            <p>If something goes wrong during a trip, file a claim with your FIR and we'll handle it.</p>
+            <a href="{% url 'vehicles' %}" class="signup-btn">Browse vehicles</a>
+        </div>
+
+    {% endif %}
+
+    <div class="notice-box info reveal">
+        <i class="fa-solid fa-shield-halved"></i>
+        <strong>How claims are verified:</strong> your incident details + photos + an
+        FIR copy are reviewed by our risk team. Genuine claims identified by FIR
+        cross-checking are approved and settled. <a href="{% url 'risk' %}" class="doc-link">Read the full policy</a>.
+    </div>
+
+</section>
+
+{% endblock %}

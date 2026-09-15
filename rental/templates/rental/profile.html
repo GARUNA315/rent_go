@@ -1,0 +1,154 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+    <div class="profile-hero reveal">
+        <div class="profile-avatar">
+            {% if verification.photo %}
+                <img src="{{ verification.photo.url }}" alt="Your photo">
+            {% else %}
+                <i class="fa-solid fa-user"></i>
+            {% endif %}
+        </div>
+        <div class="profile-id">
+            <h2>{{ user.first_name|default:user.username }} {{ user.last_name }}</h2>
+            <p>@{{ user.username }}</p>
+            <p class="profile-email"><i class="fa-solid fa-envelope"></i> {{ user.email|default:"No email set" }}</p>
+        </div>
+        <div class="verification-chip status-{{ verification.status }}">
+            {% if verification.is_verified %}
+                <i class="fa-solid fa-circle-check"></i> KYC Verified
+            {% elif verification.status == 'rejected' %}
+                <i class="fa-solid fa-circle-xmark"></i> Rejected
+            {% else %}
+                <i class="fa-solid fa-clock"></i> KYC Pending
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="tiles-grid">
+
+        <div class="stat-tile">
+            <i class="fa-solid fa-car-side"></i>
+            <h3>{{ my_vehicles|length }}</h3>
+            <p>Vehicles listed</p>
+        </div>
+        <div class="stat-tile">
+            <i class="fa-solid fa-route"></i>
+            <h3>{{ trips|length }}</h3>
+            <p>Trips</p>
+        </div>
+        <div class="stat-tile">
+            <i class="fa-solid fa-file-shield"></i>
+            <h3>{{ claims|length }}</h3>
+            <p>Claims</p>
+        </div>
+
+    </div>
+
+    <div class="profile-sections">
+
+        <div class="profile-card reveal">
+            <h3><i class="fa-solid fa-id-card"></i> Identity Verification</h3>
+            <p>
+                Upload your photo, driving licence and Aadhaar. Owners &amp; renters with a
+                verified badge are trusted more in the community.
+            </p>
+            {% if verification.is_verified %}
+                <div class="mini-status">
+                    <span class="ok-text"><i class="fa-solid fa-circle-check"></i> Your identity is verified</span>
+                    {% if verification.review_note %}<em>Note: {{ verification.review_note }}</em>{% endif %}
+                </div>
+            {% elif verification.status == 'rejected' %}
+                <div class="mini-status">
+                    <span class="bad-text"><i class="fa-solid fa-circle-xmark"></i> Verification was rejected</span>
+                    {% if verification.review_note %}<em>Reason: {{ verification.review_note }}</em>{% endif %}
+                    <p>Please fix the documents and submit again.</p>
+                </div>
+            {% else %}
+                <div class="mini-status">
+                    <span class="warn-text"><i class="fa-solid fa-clock"></i> Awaiting review by our team</span>
+                </div>
+            {% endif %}
+            <div class="profile-actions">
+                <a href="{% url 'verify' %}" class="search-button width-auto">
+                    <i class="fa-solid fa-upload"></i>
+                    {% if verification.photo %}Update documents{% else %}Verify my identity{% endif %}
+                </a>
+            </div>
+        </div>
+
+        <div class="profile-card reveal">
+            <h3><i class="fa-solid fa-car"></i> My Vehicles</h3>
+            {% if my_vehicles %}
+                <div class="compact-list">
+                    {% for v in my_vehicles %}
+                        <a href="{% url 'vehicle_detail' v.pk %}" class="compact-item">
+                            <i class="fa-solid fa-car-side"></i>
+                            <span>{{ v.brand }} {{ v.name }}</span>
+                            <span class="pill">₹{{ v.price_per_day }}/day</span>
+                            {% if not v.available %}<span class="pill busy">On trip</span>{% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">You haven't listed any vehicles yet.</p>
+            {% endif %}
+            <div class="profile-actions">
+                <a href="{% url 'add_vehicle' %}" class="login-btn">
+                    <i class="fa-solid fa-plus"></i> List a vehicle
+                </a>
+            </div>
+        </div>
+
+        <div class="profile-card reveal">
+            <h3><i class="fa-solid fa-route"></i> My Trips</h3>
+            {% if trips %}
+                <div class="compact-list">
+                    {% for t in trips %}
+                        <div class="compact-item">
+                            <i class="fa-solid fa-route"></i>
+                            <span>{{ t.vehicle.brand }} {{ t.vehicle.name }} — {{ t.vehicle.location }}</span>
+                            <span class="pill status-{{ t.status }}">
+                                {{ t.get_status_display }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">No trips yet. Rent a vehicle to start live GPS tracking.</p>
+            {% endif %}
+        </div>
+
+        <div class="profile-card reveal">
+            <h3><i class="fa-solid fa-file-shield"></i> My Claims</h3>
+            {% if claims %}
+                <div class="compact-list">
+                    {% for c in claims %}
+                        <a href="{% url 'claim_detail' c.pk %}" class="compact-item">
+                            <i class="fa-solid fa-file-shield"></i>
+                            <span>#{{ c.pk }} {{ c.get_kind_display }} — {{ c.vehicle }}</span>
+                            <span class="pill status-{{ c.status }}">{{ c.get_status_display }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">No claims filed. Accidents happen — we've got a clear process.</p>
+            {% endif %}
+            <div class="profile-actions">
+                <a href="{% url 'risk' %}" class="login-btn">
+                    <i class="fa-solid fa-shield-halved"></i> Claims &amp; risk policy
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

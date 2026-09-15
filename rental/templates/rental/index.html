@@ -1,0 +1,431 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Rent&Go - Rent Cars & Bikes Near You{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="hero-background"></div>
+
+    <div class="hero-content">
+
+        <div class="hero-left">
+
+            <p class="nearby-title">
+                <i class="fa-solid fa-location-dot"></i>
+                Your Nearby Vehicle Rental Marketplace
+            </p>
+
+            <h2>
+                Rent <span>Cars &amp; Bikes</span>
+                <br>
+                or Share Yours
+            </h2>
+
+            <p class="hero-description">
+                Find the perfect ride near you. Rent cars and bikes from trusted owners
+                or lend your own vehicle and earn. It's easy, safe and community driven.
+            </p>
+
+            <div class="hero-features">
+
+                <div class="hero-feature">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <p>Trusted<br>Owners</p>
+                </div>
+
+                <div class="hero-feature">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <p>Nearby<br>Locations</p>
+                </div>
+
+                <div class="hero-feature">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <p>Secure<br>Payments</p>
+                </div>
+
+                <div class="hero-feature">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <p>Community<br>Driven</p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="hero-vehicles">
+
+            <img src="{% static 'rental/images/verna.png' %}" alt="Verna" class="verna">
+
+            <img src="{% static 'rental/images/bullet.png' %}" alt="Bullet" class="bullet">
+
+            <p class="hero-slogan">
+                Drive into<br>Possibilities
+                <span class="yellow-line"></span>
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= DYNAMIC MARQUEE STRIP ================= -->
+
+<div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+        <span><i class="fa-solid fa-satellite-dish"></i> Live GPS Tracking</span>
+        <span><i class="fa-solid fa-id-card"></i> Photo + Licence + Aadhaar KYC</span>
+        <span><i class="fa-solid fa-registered"></i> RC &amp; Insurance Verified</span>
+        <span><i class="fa-solid fa-scale-balanced"></i> FIR-Based Claim Verification</span>
+        <span><i class="fa-solid fa-shield-heart"></i> Insured Rides</span>
+        <span><i class="fa-solid fa-satellite-dish"></i> Live GPS Tracking</span>
+        <span><i class="fa-solid fa-id-card"></i> Photo + Licence + Aadhaar KYC</span>
+        <span><i class="fa-solid fa-registered"></i> RC &amp; Insurance Verified</span>
+        <span><i class="fa-solid fa-scale-balanced"></i> FIR-Based Claim Verification</span>
+        <span><i class="fa-solid fa-shield-heart"></i> Insured Rides</span>
+    </div>
+</div>
+
+
+<!-- ================= BOOKING / SEARCH BOX ================= -->
+
+<section class="booking-box reveal">
+
+    <div class="booking-tabs">
+
+        <button type="button" class="booking-tab active">
+            <i class="fa-solid fa-car"></i>
+            Rent a Vehicle
+        </button>
+
+        <button type="button" class="booking-tab">
+            <i class="fa-solid fa-people-arrows"></i>
+            Borrow &amp; Lend
+        </button>
+
+    </div>
+
+    <form method="get" action="{% url 'vehicles' %}" id="searchForm" novalidate>
+
+        <input type="hidden" name="lat" id="latInput" value="{{ request.GET.lat }}">
+        <input type="hidden" name="lng" id="lngInput" value="{{ request.GET.lng }}">
+
+        <div class="input-box location-box">
+
+            <span class="input-icon"><i class="fa-solid fa-location-dot"></i></span>
+
+            <div class="input-content">
+                <label>Location</label>
+                <span id="locationText">
+                    {% if request.GET.lat %}Your location{% else %}Enter your nearby location{% endif %}
+                </span>
+                <input type="text" name="location" id="locationInput"
+                       value="{{ request.GET.location }}"
+                       placeholder="City / area" style="display:none;">
+            </div>
+
+            <i class="fa-solid fa-location-crosshairs near-me-icon cursor-pointer"
+               id="bookingLocationBtn" title="Use my current location"></i>
+
+        </div>
+
+        <div class="booking-grid">
+
+            <div class="input-box">
+
+                <span class="input-icon"><i class="fa-solid fa-sliders"></i></span>
+
+                <div class="input-content">
+                    <label>Vehicle Type</label>
+                    <select name="type" id="bookingType">
+                        <option value="">Car / Bike</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                    </select>
+                </div>
+
+                <i class="fa-solid fa-angle-down arrow"></i>
+
+            </div>
+
+            <button type="submit" class="search-button">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search Available Vehicles</span>
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+<!-- ================= NEARBY VEHICLES ================= -->
+
+<section class="nearby-vehicles-section reveal">
+
+    <div class="section-head">
+        <h2><i class="fa-solid fa-location-crosshairs"></i> Nearby Vehicles</h2>
+        <a href="{% url 'vehicles' %}" class="view-all">View all <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <button class="near-me-btn detection-prompt" id="nearMeBtn" type="button">
+        <i class="fa-solid fa-location-crosshairs"></i>
+        <span>Detect my location &amp; show nearby vehicles</span>
+    </button>
+
+    {% if not vehicles %}
+        <p class="nearby-note">No vehicles added yet. Be the first to add one.</p>
+    {% else %}
+        <p class="nearby-note">
+            {% if has_coords %}Sorted by distance from your current location.{% endif %}
+        </p>
+    {% endif %}
+
+    <div class="vehicle-grid">
+
+        {% for vehicle in vehicles %}
+
+            <a href="{% url 'vehicle_detail' vehicle.pk %}" class="vehicle-card">
+
+                <div class="vehicle-card-image">
+                    {% if vehicle.photo %}
+                        <img src="{{ vehicle.photo.url }}" alt="{{ vehicle.name }}"
+                             loading="lazy"
+                             data-fallback="{% if vehicle.vehicle_type == 'bike' %}{% static 'rental/images/bike-card.png' %}{% else %}{% static 'rental/images/car-card.png' %}{% endif %}">
+                    {% elif vehicle.image %}
+                        <img src="{{ vehicle.image }}" alt="{{ vehicle.name }}"
+                             loading="lazy"
+                             data-fallback="{% if vehicle.vehicle_type == 'bike' %}{% static 'rental/images/bike-card.png' %}{% else %}{% static 'rental/images/car-card.png' %}{% endif %}">
+                    {% elif vehicle.vehicle_type == 'bike' %}
+                        <img src="{% static 'rental/images/bike-card.png' %}" alt="{{ vehicle.name }}">
+                    {% else %}
+                        <img src="{% static 'rental/images/car-card.png' %}" alt="{{ vehicle.name }}">
+                    {% endif %}
+                    <span class="vehicle-type-badge">{{ vehicle.get_vehicle_type_display }}</span>
+                    {% if vehicle.distance is not None %}
+                        <span class="distance-pill on-image">~{{ vehicle.distance }} km</span>
+                    {% endif %}
+                </div>
+
+                <div class="vehicle-card-body">
+
+                    <h3>{{ vehicle.brand }} {{ vehicle.name }}</h3>
+
+                    <p class="vehicle-location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        {{ vehicle.location }}
+                    </p>
+
+                    <p class="vehicle-owner">
+                        <i class="fa-solid fa-user"></i>
+                        {{ vehicle.owner.first_name|default:vehicle.owner.username }}
+                    </p>
+
+                    <div class="vehicle-price-row">
+                        <span class="vehicle-price"><i class="fa-solid fa-indian-rupee-sign"></i> {{ vehicle.price_per_day }}<small>/day</small></span>
+                        <span class="vehicle-book">Book <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <div class="no-vehicles">
+                <i class="fa-solid fa-car-side"></i>
+                <h3>No vehicles yet</h3>
+                <p>Own a vehicle? Add it and start earning today.</p>
+                <a href="{% url 'add_vehicle' %}" class="signup-btn">Add your vehicle</a>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- ================= CATEGORY CARDS ================= -->
+
+<section class="categories reveal">
+
+    <a href="{% url 'vehicles' %}?type=car" class="category-card cars-card">
+        <div class="category-image">
+            <img src="{% static 'rental/images/car-card.png' %}" alt="Cars">
+        </div>
+        <h3>Cars</h3>
+        <p>Sedans, SUVs, Hatchbacks</p>
+        <span class="card-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+
+    <a href="{% url 'vehicles' %}?type=bike" class="category-card bikes-card">
+        <div class="category-image">
+            <img src="{% static 'rental/images/bike-card.png' %}" alt="Bikes">
+        </div>
+        <h3>Bikes</h3>
+        <p>Scooters, Sports, Commuter</p>
+        <span class="card-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+    </a>
+
+    <a href="{% url 'add_vehicle' %}" class="category-card borrow-card">
+        <div class="large-category-icon">
+            <i class="fa-solid fa-handshake"></i>
+            <i class="fa-solid fa-arrows-rotate"></i>
+        </div>
+        <h3>Borrow &amp; Lend</h3>
+        <p>Share your vehicle and earn</p>
+    </a>
+
+    <button class="category-card nearby-card" id="nearbyCategoryBtn">
+        <div class="large-category-icon nearby-icon">
+            <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <h3>Nearby</h3>
+        <p>Find rides close to you</p>
+        <span class="card-arrow"><i class="fa-solid fa-location-crosshairs"></i></span>
+    </button>
+
+</section>
+
+
+<!-- ================= HOW IT WORKS ================= -->
+
+<section class="how-it-works reveal">
+
+    <h2>How It Works?</h2>
+
+    <div class="steps">
+
+        <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3>1. Search</h3>
+            <p>Find the perfect vehicle near you.</p>
+        </div>
+
+        <span class="step-arrow"><i class="fa-solid fa-angle-right"></i></span>
+
+        <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <h3>2. Book</h3>
+            <p>Choose dates and make a request.</p>
+        </div>
+
+        <span class="step-arrow"><i class="fa-solid fa-angle-right"></i></span>
+
+        <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3>3. Pay Securely</h3>
+            <p>Use our secure payment system.</p>
+        </div>
+
+        <span class="step-arrow"><i class="fa-solid fa-angle-right"></i></span>
+
+        <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-car-side"></i></div>
+            <h3>4. Ride &amp; Enjoy</h3>
+            <p>Pick up and hit the road.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= WHY RENT & GO ================= -->
+
+<section class="why-section reveal">
+
+    <h2>Why Choose Rent&Go?</h2>
+
+    <div class="why-grid">
+
+        <p class="why-item">
+            <i class="fa-solid fa-circle-check"></i>
+            Verified users &amp; vehicles
+        </p>
+
+        <p class="why-item">
+            <i class="fa-solid fa-circle-check"></i>
+            Secure online payments
+        </p>
+
+        <p class="why-item">
+            <i class="fa-solid fa-circle-check"></i>
+            Flexible rental plans
+        </p>
+
+        <p class="why-item">
+            <i class="fa-solid fa-circle-check"></i>
+            24/7 customer support
+        </p>
+
+        <p class="why-item">
+            <i class="fa-solid fa-circle-check"></i>
+            Affordable prices
+        </p>
+
+        <p class="why-item">
+            <i class="fa-solid fa-circle-check"></i>
+            Easy booking &amp; management
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ================= STATISTICS ================= -->
+
+<section class="stats reveal">
+
+    <div class="stat">
+        <span class="stat-icon"><i class="fa-solid fa-car-side"></i></span>
+        <div>
+            <h3>1,200+</h3>
+            <p>Vehicles listed by<br>trusted owners</p>
+        </div>
+    </div>
+
+    <div class="stat">
+        <span class="stat-icon"><i class="fa-solid fa-users"></i></span>
+        <div>
+            <h3>8,500+</h3>
+            <p>Happy riders across<br>cities in India</p>
+        </div>
+    </div>
+
+    <div class="stat">
+        <span class="stat-icon"><i class="fa-solid fa-star"></i></span>
+        <div>
+            <h3>4.8 / 5</h3>
+            <p>Average rating from<br>verified rentals</p>
+        </div>
+    </div>
+
+    <div class="stat">
+        <span class="stat-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <div>
+            <h3>100%</h3>
+            <p>Payment protection<br>for every booking</p>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

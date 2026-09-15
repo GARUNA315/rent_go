@@ -1,0 +1,119 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Risk Management &amp; Terms - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="risk-page">
+
+    <div class="risk-hero reveal">
+        <div class="risk-hero-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2>Risk Management &amp; Terms</h2>
+        <p>How Rent&Go keeps every trip safe — and exactly when, how and why you can claim.</p>
+    </div>
+
+    <div class="risk-toc reveal">
+        <h3>On this page</h3>
+        <div class="risk-toc-links">
+            <a href="#what-you-can-claim"><i class="fa-solid fa-angles-right"></i> What you can claim</a>
+            <a href="#fir-verification"><i class="fa-solid fa-scale-balanced"></i> FIR verification — is the claim true?</a>
+            <a href="#insurance"><i class="fa-solid fa-shield-heart"></i> Insurance &amp; RC</a>
+            <a href="#gps"><i class="fa-solid fa-satellite-dish"></i> GPS tracking as evidence</a>
+            <a href="#terms"><i class="fa-solid fa-file-contract"></i> Terms &amp; Conditions</a>
+        </div>
+    </div>
+
+    <div class="risk-grid">
+
+        <div class="risk-section reveal" id="what-you-can-claim">
+            <h3><i class="fa-solid fa-bullhorn"></i> What you can claim</h3>
+            <p>During the rental period the following incidents can be claimed through Rent&Go:</p>
+            <ul>
+                <li><i class="fa-solid fa-car-crash"></i> <strong>Accidents</strong> — collision damage while riding/driving.</li>
+                <li><i class="fa-solid fa-brush"></i> <strong>Damages</strong> — scratches, dents or interior damage caused during the trip.</li>
+                <li><i class="fa-solid fa-mask"></i> <strong>Theft</strong> — vehicle stolen while in your custody.</li>
+                <li><i class="fa-solid fa-wrench"></i> <strong>Breakdowns</strong> — mechanical failure, towing &amp; recovery.</li>
+            </ul>
+            <p>Claims <strong>not covered</strong>: drunk driving, racing, off-roading, use as a taxi,
+                unauthorised drivers, and damage hidden from the handover checklist.</p>
+        </div>
+
+        <div class="risk-section reveal" id="fir-verification">
+            <h3><i class="fa-solid fa-scale-balanced"></i> FIR verification — how we check the claim is TRUE</h3>
+            <p>Every accident, damage-from-collision or theft claim is verified before a single rupee is paid out:</p>
+            <ol>
+                <li><strong>You file the claim</strong> with incident details, damage photos and date/time.</li>
+                <li><strong>FIR is mandatory.</strong> Register an FIR at the nearest police station and
+                    upload the FIR number, police-station name and a copy of the FIR document.</li>
+                <li><strong>Our risk team cross-checks</strong> the FIR document, the damage photos and the
+                    <a href="#gps" class="doc-link">live GPS route &amp; speed log</a> recorded during the trip.</li>
+                <li>The team marks the claim <span class="pill verified-ok">Verified genuine ✓</span> or
+                    <span class="pill verified-pending">Rejected ✕</span> with a public decision note.</li>
+                <li>Genuine claims are <strong>approved for payout</strong> and then <strong>settled</strong>
+                    directly to your account.</li>
+            </ol>
+            <p class="callout"><i class="fa-solid fa-circle-exclamation"></i>
+                Claims with a valid FIR and matching GPS evidence are almost always approved.
+                Claims without an FIR are treated as unverified.</p>
+        </div>
+
+        <div class="risk-section reveal" id="insurance">
+            <h3><i class="fa-solid fa-shield-heart"></i> Insurance &amp; RC</h3>
+            <p>Every listed vehicle must carry a valid <strong>Registration Certificate (RC)</strong> and an
+                <strong>active insurance policy</strong>. You can see these details on every vehicle page:</p>
+            <ul>
+                <li><i class="fa-solid fa-registered"></i> RC / registration number + RC photo.</li>
+                <li><i class="fa-solid fa-shield-halved"></i> Insurance policy number, provider and validity date.</li>
+                <li><i class="fa-solid fa-circle-check"></i> Live badge showing insurance
+                    <strong>active / expiring / expired</strong>.</li>
+            </ul>
+            <p>Only vehicles with unexpired insurance are actively promoted. Owners with an
+                <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span> identity
+                are shown first.</p>
+        </div>
+
+        <div class="risk-section reveal" id="gps">
+            <h3><i class="fa-solid fa-satellite-dish"></i> GPS tracking as evidence</h3>
+            <p>During every rental trip, the vehicle's position, route and speed are recorded
+                (from the renter's GPS or an in-vehicle tracker). This log is used to:</p>
+            <ul>
+                <li><i class="fa-solid fa-location-crosshairs"></i> Show the owner and renter where the vehicle is, live.</li>
+                <li><i class="fa-solid fa-route"></i> Prove whether the incident happened on the reported route.</li>
+                <li><i class="fa-solid fa-gauge-high"></i> Cross-check speeds against the reported cause of the accident.</li>
+            </ul>
+        </div>
+
+        <div class="risk-section reveal" id="terms">
+            <h3><i class="fa-solid fa-file-contract"></i> Terms &amp; Conditions</h3>
+            <ul>
+                <li><i class="fa-solid fa-user-check"></i> <strong>Identity:</strong> renters and owners must complete
+                    photo + driving licence + Aadhaar verification.</li>
+                <li><i class="fa-solid fa-id-card"></i> <strong>Licence:</strong> only validly licensed riders/drivers
+                    may operate a vehicle.</li>
+                <li><i class="fa-solid fa-money-check-dollar"></i> <strong>Payment:</strong> rental fees are collected
+                    before pickup; refunds follow the claims process.</li>
+                <li><i class="fa-solid fa-clock"></i> <strong>Return:</strong> the vehicle must be returned on time.
+                    Late returns are billed at the daily rate.</li>
+                <li><i class="fa-solid fa-gas-pump"></i> <strong>Fuel &amp; tolls:</strong> paid by the renter unless
+                    agreed otherwise.</li>
+                <li><i class="fa-solid fa-shield-halved"></i> <strong>Liability:</strong> Rent&Go is a marketplace.
+                    Physical vehicle liability during a trip sits with the renter, while financial claims
+                    (damage up to the insured value) are settled through this claims process.</li>
+                <li><i class="fa-solid fa-ban"></i> <strong>Prohibited:</strong> smoking, pets, illegal activity,
+                    sub-leasing, racing, or carrying more passengers than the seat capacity.</li>
+                <li><i class="fa-solid fa-gavel"></i> <strong>Disputes:</strong> disagreements about a claim are
+                    settled using the FIR + GPS evidence above. False claims are reported to the police.</li>
+            </ul>
+            <p class="callout"><i class="fa-solid fa-circle-info"></i>
+                By booking on Rent&Go you accept these terms. Keep your receipts, photos and FIR copies —
+                they protect you.</p>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Rent&Go - Vehicle Rental Marketplace{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'rental/css/style.css' %}">
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="mouse-glow" id="mouseGlow"></div>
+
+<div class="app">
+
+    <a href="#top" class="back-to-top" id="backToTop" title="Back to top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+
+    {% if messages %}
+        <div class="message-stack">
+            {% for message in messages %}
+                <div class="message message-{{ message.tags }}" onclick="this.remove()">
+                    <i class="fa-solid fa-circle-info"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <header class="header">
+
+        <a href="{% url 'home' %}" class="logo-area">
+
+            <div class="logo-icon">
+                <i class="fa-solid fa-location-dot"></i>
+                <i class="fa-solid fa-car-side car-logo"></i>
+            </div>
+
+            <div class="logo-text">
+                <h1>Rent<span>&</span>Go</h1>
+                <p>Drive&nbsp;&nbsp;·&nbsp;&nbsp;Ride&nbsp;&nbsp;·&nbsp;&nbsp;Share</p>
+            </div>
+
+        </a>
+
+        <div class="header-buttons">
+
+            {% if user.is_authenticated %}
+
+                {% if user.is_staff %}
+                    <a href="{% url 'otp_inbox' %}" class="login-btn add-vehicle-link">
+                        <i class="fa-solid fa-envelope-open-text"></i> OTP Inbox
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'add_vehicle' %}" class="login-btn add-vehicle-link">
+                    <i class="fa-solid fa-plus"></i> Add Vehicle
+                </a>
+
+                <a href="{% url 'claims' %}" class="login-btn add-vehicle-link">
+                    <i class="fa-solid fa-file-shield"></i> Claims
+                </a>
+
+                <a href="{% url 'profile' %}" class="signup-btn">
+                    <i class="fa-solid fa-user-check"></i>
+                    {{ user.first_name|default:user.username }}
+                </a>
+
+            {% else %}
+
+                <a href="{% url 'auth' %}?mode=login" class="login-btn">Login</a>
+
+                <a href="{% url 'auth' %}?mode=signup" class="signup-btn">
+                    <i class="fa-solid fa-user"></i> Sign Up
+                </a>
+
+            {% endif %}
+
+            <button class="menu-btn" onclick="document.querySelector('.app').classList.toggle('menu-open')">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+        </div>
+
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <nav class="bottom-nav">
+
+        <a href="{% url 'home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+
+        <a href="{% url 'vehicles' %}" class="nav-item {% if request.resolver_match.url_name == 'vehicles' %}active{% endif %}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+        </a>
+
+        <a href="{% url 'vehicles' %}" class="nav-item">
+            <i class="fa-regular fa-heart"></i>
+            <span>Saved</span>
+        </a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-item">
+        {% endif %}
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+
+    </nav>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-text">
+                    <h1>Rent<span>&</span>Go</h1>
+                    <p>Drive · Ride · Share</p>
+                </div>
+                <p class="footer-tagline">
+                    Community-driven vehicle rentals with GPS tracking,
+                    full KYC verification and a transparent claims &amp; FIR process.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h3>Explore</h3>
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'vehicles' %}">Find Vehicles</a>
+                <a href="{% url 'add_vehicle' %}">List a Vehicle</a>
+                <a href="{% url 'risk' %}">Risk Management &amp; Terms</a>
+            </div>
+            <div class="footer-links">
+                <h3>Account</h3>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}">My Profile &amp; KYC</a>
+                    <a href="{% url 'verify' %}">Verify Identity</a>
+                    <a href="{% url 'claims' %}">My Claims</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'register' %}">Sign Up</a>
+                {% endif %}
+            </div>
+            <div class="footer-links">
+                <h3>Trust &amp; Safety</h3>
+                <a href="{% url 'risk' %}#what-you-can-claim">What you can claim</a>
+                <a href="{% url 'risk' %}#fir-verification">FIR verification</a>
+                <a href="{% url 'risk' %}#insurance">Insurance &amp; RC</a>
+                <a href="{% url 'risk' %}#terms">Terms &amp; Conditions</a>
+            </div>
+        </div>
+        <p class="footer-bottom">
+            © {% now "Y" %} Rent&Go — Rent cars &amp; bikes or share yours. All rights reserved.
+        </p>
+    </footer>
+
+</div>
+
+<script src="{% static 'rental/js/app.js' %}"></script>
+<script src="{% static 'rental/js/effects.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

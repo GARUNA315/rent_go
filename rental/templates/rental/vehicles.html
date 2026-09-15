@@ -1,0 +1,120 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Vehicles - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="vehicles-page">
+
+    <div class="vehicles-hero reveal">
+        <h2>Find Your Ride</h2>
+        <p>{% if has_coords %}Showing vehicles sorted by distance from your location.{% else %}Search available vehicles near you.{% endif %}</p>
+    </div>
+
+    <div class="vehicles-filter-bar reveal">
+
+        <form method="get" action="{% url 'vehicles' %}" id="vehicleFilterForm" class="filter-form">
+
+            <input type="hidden" id="fLat" name="lat" value="{{ request.GET.lat }}">
+            <input type="hidden" id="fLng" name="lng" value="{{ request.GET.lng }}">
+
+            <div class="filter-field">
+                <i class="fa-solid fa-car"></i>
+                <select name="type" id="filterType">
+                    <option value="">All Vehicles</option>
+                    <option value="car" {% if vehicle_type == 'car' %}selected{% endif %}>Cars</option>
+                    <option value="bike" {% if vehicle_type == 'bike' %}selected{% endif %}>Bikes</option>
+                </select>
+            </div>
+
+            <div class="filter-field grow">
+                <i class="fa-solid fa-location-dot"></i>
+                <input type="text" id="filterLocation" name="location"
+                       placeholder="City / area" value="{{ location }}">
+            </div>
+
+            <button type="submit" class="search-button filter-submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Filter</span>
+            </button>
+
+        </form>
+
+        <button class="near-me-btn" id="filterNearMe" type="button">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <span>Vehicles Near Me</span>
+        </button>
+
+    </div>
+
+    <div class="vehicles-count reveal">
+        <p><strong>{{ count }}</strong> vehicle{{ count|pluralize }} found</p>
+        <span id="geoStatus"></span>
+    </div>
+
+    <div class="vehicle-grid full-grid reveal">
+
+        {% for vehicle in vehicles %}
+
+            <a href="{% url 'vehicle_detail' vehicle.pk %}" class="vehicle-card">
+
+                <div class="vehicle-card-image">
+                    {% if vehicle.photo %}
+                        <img src="{{ vehicle.photo.url }}" alt="{{ vehicle.name }}"
+                             loading="lazy"
+                             data-fallback="{% if vehicle.vehicle_type == 'bike' %}{% static 'rental/images/bike-card.png' %}{% else %}{% static 'rental/images/car-card.png' %}{% endif %}">
+                    {% elif vehicle.image %}
+                        <img src="{{ vehicle.image }}" alt="{{ vehicle.name }}"
+                             loading="lazy"
+                             data-fallback="{% if vehicle.vehicle_type == 'bike' %}{% static 'rental/images/bike-card.png' %}{% else %}{% static 'rental/images/car-card.png' %}{% endif %}">
+                    {% elif vehicle.vehicle_type == 'bike' %}
+                        <img src="{% static 'rental/images/bike-card.png' %}" alt="{{ vehicle.name }}">
+                    {% else %}
+                        <img src="{% static 'rental/images/car-card.png' %}" alt="{{ vehicle.name }}">
+                    {% endif %}
+                    <span class="vehicle-type-badge">{{ vehicle.get_vehicle_type_display }}</span>
+                    {% if vehicle.distance is not None %}
+                        <span class="distance-pill on-image">~{{ vehicle.distance }} km</span>
+                    {% endif %}
+                </div>
+
+                <div class="vehicle-card-body">
+
+                    <h3>{{ vehicle.brand }} {{ vehicle.name }}</h3>
+
+                    <p class="vehicle-location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        {{ vehicle.location }}
+                    </p>
+
+                    <p class="vehicle-owner">
+                        <i class="fa-solid fa-user"></i>
+                        {{ vehicle.owner.first_name|default:vehicle.owner.username }}
+                    </p>
+
+                    <div class="vehicle-price-row">
+                        <span class="vehicle-price"><i class="fa-solid fa-indian-rupee-sign"></i> {{ vehicle.price_per_day }}<small>/day</small></span>
+                        <span class="vehicle-book">Book <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <div class="no-vehicles wide">
+                <i class="fa-solid fa-car-side"></i>
+                <h3>No vehicles found</h3>
+                <p>Try a different location or vehicle type, or add your own vehicle.</p>
+                <a href="{% url 'add_vehicle' %}" class="signup-btn">Add your vehicle</a>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

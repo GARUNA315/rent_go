@@ -1,0 +1,23 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+db.sqlite3
+
+# Node
+node_modules/
+
+# Generated / build artifacts
+.rentgo_ppt_build/
+.chart-data-*/
+
+# User-uploaded media
+media/
+
+# Windows / Office temp
+~$*.pptx
+*.lnk
+Thumbs.db

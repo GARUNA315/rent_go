@@ -1,0 +1,141 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}Add Vehicle - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="add-vehicle-page">
+
+    <div class="add-vehicle-head">
+        <h2><i class="fa-solid fa-car-side"></i> Add Your Vehicle</h2>
+        <p>Share your vehicle and earn. Fill the details below.</p>
+    </div>
+
+    <div class="add-vehicle-card">
+
+        <form method="post" action="{% url 'add_vehicle' %}" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="add-vehicle-grid">
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-car"></i> Vehicle Name</span>
+                    {{ form.name }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-industry"></i> Brand</span>
+                    {{ form.brand }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-sliders"></i> Type</span>
+                    {{ form.vehicle_type }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-calendar-days"></i> Model Year</span>
+                    {{ form.year }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-indian-rupee-sign"></i> Price per Day (₹)</span>
+                    {{ form.price_per_day }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-image"></i> Vehicle Photo</span>
+                    {{ form.photo }}
+                    <small class="field-hint">Upload a clear photo of the vehicle (shown on the card).</small>
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-location-dot"></i> Location (City / Area)</span>
+                    {{ form.location }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-map-pin"></i> Latitude</span>
+                    {{ form.latitude }}
+                </label>
+
+                <label class="auth-field">
+                    <span><i class="fa-solid fa-map-pin"></i> Longitude</span>
+                    {{ form.longitude }}
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-align-left"></i> Description</span>
+                    {{ form.description }}
+                </label>
+
+                <label class="auth-field wide">
+                    <span><i class="fa-solid fa-circle-check"></i> Available for rent?</span>
+                    {{ form.available }}
+                </label>
+
+            </div>
+
+            <div class="doc-block">
+                <h3><i class="fa-solid fa-folder-open"></i> Vehicle Documents (recommended)</h3>
+
+                <div class="add-vehicle-grid">
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-registered"></i> Registration (RC) No.</span>
+                        {{ form.registration_number }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-file-lines"></i> RC Photo</span>
+                        {{ form.rc_image }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-shield-halved"></i> Insurance Policy No.</span>
+                        {{ form.insurance_number }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-building-shield"></i> Insurance Provider</span>
+                        {{ form.insurance_provider }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-calendar-check"></i> Insurance Valid Till</span>
+                        {{ form.insurance_valid_until }}
+                    </label>
+
+                    <label class="auth-field">
+                        <span><i class="fa-solid fa-file-shield"></i> Insurance Policy Photo</span>
+                        {{ form.insurance_image }}
+                    </label>
+
+                </div>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="message message-error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="add-vehicle-actions">
+
+                <button type="button" class="near-me-btn" id="addVehicleLocate">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span>Use my current location</span>
+                </button>
+
+                <button type="submit" class="search-button width-auto">
+                    <i class="fa-solid fa-plus"></i> Add Vehicle
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'rental/base.html' %}
+{% load static %}
+
+{% block title %}{{ vehicle.brand }} {{ vehicle.name }} - Rent&Go{% endblock %}
+
+{% block content %}
+
+<section class="detail-page">
+
+    <div class="detail-back" onclick="history.back()">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </div>
+
+    <div class="detail-card">
+
+        <div class="detail-image">
+            {% if vehicle.photo %}
+                <img src="{{ vehicle.photo.url }}" alt="{{ vehicle.name }}"
+                     data-fallback="{% if vehicle.vehicle_type == 'bike' %}{% static 'rental/images/bike-card.png' %}{% else %}{% static 'rental/images/car-card.png' %}{% endif %}">
+            {% elif vehicle.image %}
+                <img src="{{ vehicle.image }}" alt="{{ vehicle.name }}"
+                     data-fallback="{% if vehicle.vehicle_type == 'bike' %}{% static 'rental/images/bike-card.png' %}{% else %}{% static 'rental/images/car-card.png' %}{% endif %}">
+            {% elif vehicle.vehicle_type == 'bike' %}
+                <img src="{% static 'rental/images/bike-card.png' %}" alt="{{ vehicle.name }}">
+            {% else %}
+                <img src="{% static 'rental/images/car-card.png' %}" alt="{{ vehicle.name }}">
+            {% endif %}
+            <span class="vehicle-type-badge">{{ vehicle.get_vehicle_type_display }}</span>
+            {% if vehicle.insurance_status == 'active' %}
+                <span class="badge-insured"><i class="fa-solid fa-shield-heart"></i> Insured</span>
+            {% elif vehicle.insurance_status == 'expiring_soon' %}
+                <span class="badge-insured warning"><i class="fa-solid fa-triangle-exclamation"></i> Ins. expiring</span>
+            {% elif vehicle.insurance_status == 'expired' %}
+                <span class="badge-insured danger"><i class="fa-solid fa-circle-exclamation"></i> Ins. expired</span>
+            {% endif %}
+        </div>
+
+        <div class="detail-body">
+
+            <h2>{{ vehicle.brand }} {{ vehicle.name }}</h2>
+
+            <p class="detail-location">
+                <i class="fa-solid fa-location-dot"></i> {{ vehicle.location }}
+                {% if distance %}<span class="distance-pill">~{{ distance }} km away</span>{% endif %}
+            </p>
+
+            <div class="detail-meta">
+
+                <div class="meta-chip">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Model {{ vehicle.year }}</span>
+                </div>
+
+                <div class="meta-chip">
+                    <i class="fa-solid fa-user"></i>
+                    <span>{{ vehicle.owner.first_name|default:vehicle.owner.username }}</span>
+                </div>
+
+                <div class="meta-chip">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>{% if vehicle.available %}Available now{% else %}On a trip{% endif %}</span>
+                </div>
+
+            </div>
+
+            <div class="detail-price">
+                <span class="vehicle-price big"><i class="fa-solid fa-indian-rupee-sign"></i> {{ vehicle.price_per_day }}<small>/day</small></span>
+            </div>
+
+            <div class="detail-description">
+                <h3>About this vehicle</h3>
+                <p>{{ vehicle.description|default:"Everything you need for a smooth, comfortable ride. Contact the owner for more details." }}</p>
+            </div>
+
+            {% if vehicle.registration_number or vehicle.insurance_number %}
+                <div class="doc-block reveal">
+                    <h3><i class="fa-solid fa-folder-open"></i> Vehicle &amp; Owner Documents</h3>
+
+                    <div class="doc-grid">
+
+                        <div class="doc-item">
+                            <div class="doc-icon"><i class="fa-solid fa-id-card"></i></div>
+                            <div>
+                                <span class="doc-label">Owner</span>
+                                <strong>{{ vehicle.owner.first_name|default:vehicle.owner.username }}
+                                    {% if owner_verified %}
+                                        <span class="verified-badge" title="Identity verified by Rent&Go">
+                                            <i class="fa-solid fa-circle-check"></i> Verified
+                                        </span>
+                                    {% else %}
+                                        <span class="unverified-badge" title="Identity is pending verification">
+                                            <i class="fa-solid fa-clock"></i> Unverified
+                                        </span>
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="doc-item">
+                            <div class="doc-icon"><i class="fa-solid fa-registered"></i></div>
+                            <div>
+                                <span class="doc-label">Registration (RC)</span>
+                                <strong>{{ vehicle.registration_number|default:"Not provided" }}</strong>
+                                {% if vehicle.rc_image %}
+                                    <a href="{{ vehicle.rc_image.url }}" target="_blank" class="doc-link">
+                                        <i class="fa-solid fa-image"></i> View RC
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="doc-item">
+                            <div class="doc-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div>
+                                <span class="doc-label">Insurance</span>
+                                <strong>{{ vehicle.insurance_provider|default:"-" }}
+                                    {% if vehicle.insurance_number %}#{{ vehicle.insurance_number }}{% endif %}</strong>
+                                <span class="doc-meta">
+                                    {% if vehicle.insurance_valid_until %}
+                                        Valid till {{ vehicle.insurance_valid_until|date:"d M Y" }} ·
+                                        {% if vehicle.insurance_status == 'active' %}
+                                            <em class="ok-text">active</em>
+                                        {% elif vehicle.insurance_status == 'expiring_soon' %}
+                                            <em class="warn-text">expiring soon</em>
+                                        {% else %}
+                                            <em class="bad-text">expired</em>
+                                        {% endif %}
+                                    {% else %}
+                                        Validity not set
+                                    {% endif %}
+                                </span>
+                                {% if vehicle.insurance_image %}
+                                    <a href="{{ vehicle.insurance_image.url }}" target="_blank" class="doc-link">
+                                        <i class="fa-solid fa-image"></i> View policy
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="detail-actions">
+
+                {% if active_trip %}
+                    <a href="{% url 'track_trip' active_trip.pk %}" class="signup-btn">
+                        <i class="fa-solid fa-satellite-dish"></i> Live GPS Track
+                    </a>
+                {% elif user.is_authenticated %}
+                    {% if user != vehicle.owner %}
+                        <form action="{% url 'start_trip' vehicle.pk %}" method="post"
+                              onsubmit="return confirm('Start a rental trip and enable live GPS tracking?');">
+                            {% csrf_token %}
+                            <button type="submit" class="signup-btn">
+                                <i class="fa-solid fa-play"></i> Start Trip &amp; Track
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="signup-btn">
+                        <i class="fa-solid fa-calendar-check"></i> Book This Vehicle
+                    </a>
+                {% endif %}
+
+                <button class="login-btn" id="callOwnerBtn">
+                    <i class="fa-solid fa-phone"></i> Contact Owner
+                </button>
+
+                <a href="{% url 'file_claim' vehicle.pk %}" class="login-btn claim-btn">
+                    <i class="fa-solid fa-file-shield"></i> File a Claim
+                </a>
+
+            </div>
+
+            <div class="detail-note" id="bookingNote" style="display:none;">
+                <i class="fa-solid fa-circle-info"></i>
+                Booking request feature is coming soon. Please contact the owner directly.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
